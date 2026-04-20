@@ -155,8 +155,8 @@
     </style>
     <script>
     window.RSVP_CONFIG = {
-        slug:      'xv-anos-dulce-camila',
-        baseUrl:   'https://dulce-camila.invitados.org/',
+        slug:      'xv-dulce-camila-avina',
+        baseUrl:   'https://dulce-camila-avina.invitados.org/',
         pin:       '2584',
         eventName: 'XV Años de Dulce Camila | Foro 7'
     };
@@ -169,7 +169,7 @@
   const SB='https://nzpujmlienzfetqcgsxz.supabase.co';
   const AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cHVqbWxpZW56ZmV0cWNnc3h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODYzMzYsImV4cCI6MjA5MDI2MjMzNn0.xl3lsb-KYj5tVLKTnzpbsdEGoV9ySnswH4eyRuyEH1s';
   const H={apikey:AK,Authorization:'Bearer '+AK,'Content-Type':'application/json'};
-  const SLUG='xv-anos-dulce-camila';
+  const SLUG='xv-dulce-camila-avina';
   async function checkNotif(){
     try{
       const er=await fetch(`${SB}/rest/v1/eventos?slug=eq.${SLUG}&select=id&limit=1`,{headers:H});
