@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios Foro 7 - Paquetes de Foto y Video</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 900;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 3rem;
+            font-weight: 700;
+        }
+
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .package-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .package-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .package-header {
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .package-basic .package-header {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        }
+
+        .package-premium .package-header {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .package-super .package-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .package-deluxe .package-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .package-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .package-price {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 1rem 0;
+        }
+
+        .package-price small {
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        .package-body {
+            padding: 2rem;
+        }
+
+        .package-features {
+            list-style: none;
+        }
+
+        .package-features li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .package-features li:before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .package-features li:last-child {
+            border-bottom: none;
+        }
+
+        .highlight-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .cta-button {
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-title {
+            font-size: 1.3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .contact-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: 20px;
+        }
+
+        .contact-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-info {
+            font-size: 1.3rem;
+            margin: 1rem 0;
+        }
+
+        .whatsapp-button {
+            display: inline-block;
+            background: #25D366;
+            color: white;
+            padding: 1.5rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            transition: all 0.3s;
+        }
+
+        .whatsapp-button:hover {
+            background: #128C7E;
+            transform: scale(1.05);
+        }
+
+        .testimonial {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .packages-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .package-price {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+    <div class="hero">
+        <h1>📸 FORO 7 PRODUCCIONES</h1>
+        <p>Fotografía, Video, Dron e Invitaciones Web</p>
+
+        <div class="nav-links">
+            <a href="index.html">Invitación</a>
+            <a href="contrato.html">Contrato</a>
+            <a href="logistica.html">Logística</a>
+            <a href="publicidad.html">Publicidad</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Paquetes -->
+        <section class="section">
+            <h2 class="section-title">Nuestros Paquetes de Foto y Video</h2>
+
+            <div class="packages-grid">
+                <!-- Paquete Básico -->
+                <div class="package-card package-basic">
+                    <div class="package-header">
+                        <h3 class="package-title">Paquete Básico</h3>
+                        <p class="package-price">$4,500</p>
+                    </div>
+                    <div class="package-body">
+                        <ul class="package-features">
+                            <li>Cobertura de misa y fiesta</li>
+                            <li>50 fotografías impresas 5x7"</li>
+                            <li>Video USB editado y musicalizado</li>
+                            <li>1 caja impresa para USB</li>
+                            <li>1 foto ampliada 30x40 cm</li>
+                            <li>1 caja para fotografías</li>
+                            <li>Todas las fotos editadas</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Paquete Contratado -->
+                <div class="package-card package-premium">
+                    <div class="package-header">
+                        <div class="highlight-badge">⭐ PAQUETE CONTRATADO</div>
+                        <h3 class="package-title">Foto + Video</h3>
+                        <p class="package-price">$6,500</p>
+                    </div>
+                    <div class="package-body">
+                        <ul class="package-features">
+                            <li><strong>Cobertura sesión, misa y fiesta</strong></li>
+                            <li><strong>100 fotografías impresas 5x7"</strong></li>
+                            <li><strong>Video USB editado, musicalizado y titulado</strong></li>
+                            <li><strong>Videoclip para proyección en salón</strong></li>
+                            <li><strong>1 caja impresa para USB</strong></li>
+                            <li><strong>1 foto ampliada 50x60 cm con marco</strong></li>
+                            <li><strong>1 caja impresa para fotografías</strong></li>
+                            <li><strong>1 sesión fotográfica previa</strong></li>
+                            <li><strong>Todas las fotos editadas</strong></li>
+                            <li><strong>Invitación web GRATIS</strong></li>
+                        </ul>
+                        <a href="https://wa.me/5214779203776?text=Hola,%20me%20interesa%20el%20paquete%20de%20$6,500" class="cta-button">
+                            💬 Contratar Este Paquete
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Paquete Super -->
+                <div class="package-card package-super">
+                    <div class="package-header">
+                        <h3 class="package-title">Super Paquete</h3>
+                        <p class="package-price">$7,500</p>
+                    </div>
+                    <div class="package-body">
+                        <ul class="package-features">
+                            <li>Cobertura sesión, misa y fiesta</li>
+                            <li>200 fotografías impresas 5x7"</li>
+                            <li>Video USB 4 horas editado</li>
+                            <li>1 ampliación 20x24" con marco</li>
+                            <li>Caballete (prestado)</li>
+                            <li>Pantalla digital con marco (prestado)</li>
+                            <li>Caja de madera para fotos</li>
+                            <li>Caja impresa para video</li>
+                            <li>Sesiones antes y día del evento</li>
+                            <li>Respaldo redes sociales</li>
+                            <li>Invitación web personalizada</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Paquete Deluxe -->
+                <div class="package-card package-deluxe">
+                    <div class="package-header">
+                        <h3 class="package-title">Paquete Deluxe</h3>
+                        <p class="package-price">$8,500</p>
+                    </div>
+                    <div class="package-body">
+                        <ul class="package-features">
+                            <li>Todo lo del Super Paquete</li>
+                            <li>+ Cobertura con DRON</li>
+                            <li>+ Video aéreo profesional</li>
+                            <li>+ Fotos aéreas espectaculares</li>
+                            <li>+ Tomas panorámicas del evento</li>
+                            <li>+ Edición especial con tomas aéreas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Servicios Adicionales -->
+        <section class="section">
+            <h2 class="section-title">Servicios Incluidos</h2>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">📸</div>
+                    <h3 class="service-title">Fotografía Profesional</h3>
+                    <p>Equipo de alta gama con 3 flashes para capturar cada momento especial</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🎥</div>
+                    <h3 class="service-title">Video HD</h3>
+                    <p>2 luces de video profesionales, edición musicalizada y titulada</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🌐</div>
+                    <h3 class="service-title">Invitación Web</h3>
+                    <p>Página web personalizada para compartir en redes sociales</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">✨</div>
+                    <h3 class="service-title">Edición Premium</h3>
+                    <p>Todas las fotos editadas profesionalmente, retoque digital incluido</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📱</div>
+                    <h3 class="service-title">Redes Sociales</h3>
+                    <p>Respaldo en Facebook y YouTube para compartir con familia y amigos</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🚁</div>
+                    <h3 class="service-title">Tomas con Dron</h3>
+                    <p>Disponible desde $500 - Vistas aéreas espectaculares del evento</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Demo -->
+        <section class="section">
+            <h2 class="section-title">Ejemplo de Nuestro Trabajo</h2>
+            <div style="text-align: center; background: white; padding: 3rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <p style="margin-bottom: 2rem; font-size: 1.2rem; color: #666;">
+                    Mira cómo personalizamos la música para cada evento
+                </p>
+                <a href="https://youtu.be/wwsLq4HkTHs?feature=shared" target="_blank" style="display: inline-block; background: #FF0000; color: white; padding: 1.5rem 3rem; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 1.2rem;">
+                    ▶️ Ver Video de Ejemplo
+                </a>
+            </div>
+        </section>
+
+        <!-- Testimonial -->
+        <section class="section">
+            <h2 class="section-title">Lo Que Dicen Nuestros Clientes</h2>
+            <div class="testimonial">
+                <p style="font-size: 1.2rem; line-height: 1.8; color: #666;">
+                    "Excelente servicio! Las fotos quedaron hermosas y el video nos encantó.
+                    La música personalizada le dio un toque muy especial.
+                    Foro 7 capturó cada momento importante de los XV años.
+                    Totalmente recomendados!"
+                </p>
+                <p style="margin-top: 1.5rem; font-weight: 700; color: #667eea;">
+                    - Familias satisfechas en León, Gto.
+                </p>
+            </div>
+        </section>
+
+        <!-- Ventajas -->
+        <section class="section">
+            <h2 class="section-title">¿Por Qué Elegir Foro 7?</h2>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">💰</div>
+                    <h3 class="service-title">Precios Accesibles</h3>
+                    <p>Paquetes desde $4,500 con apartado flexible</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🎨</div>
+                    <h3 class="service-title">Edición Personalizada</h3>
+                    <p>Música, títulos y efectos personalizados para tu evento</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">⚡</div>
+                    <h3 class="service-title">Equipo Profesional</h3>
+                    <p>3 flashes de foto, 2 luces de video, dron disponible</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📅</div>
+                    <h3 class="service-title">Flexibilidad</h3>
+                    <p>Apartado desde lo que gustes, liquidación 7 días antes</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🎁</div>
+                    <h3 class="service-title">Invitación Web GRATIS</h3>
+                    <p>Página personalizada incluida en paquetes de $6,500+</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">⭐</div>
+                    <h3 class="service-title">Experiencia</h3>
+                    <p>Años de experiencia en bodas, XV años y eventos sociales</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contacto -->
+        <section class="section">
+            <div class="contact-section">
+                <h2>¿Listo para Capturar Tu Evento Especial?</h2>
+                <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+                    Contáctanos hoy mismo y reserva tu fecha
+                </p>
+
+                <div class="contact-info">
+                    <p>📱 WhatsApp: 477-920-3776</p>
+                    <p>📧 Email: foro7producciones@gmail.com</p>
+                    <p>📍 Padilla 112, Cumbres de Arbide, León, Gto.</p>
+                </div>
+
+                <a href="https://wa.me/5214779203776?text=Hola,%20me%20interesa%20información%20sobre%20sus%20paquetes%20de%20foto%20y%20video" class="whatsapp-button">
+                    💬 Chatear por WhatsApp
+                </a>
+
+                <p style="margin-top: 3rem; font-size: 1.1rem;">
+                    💳 <strong>Cuenta BBVA:</strong> 4152 3137 6890 8985<br>
+                    <strong>Titular:</strong> Juan Arturo Cruz Armenta
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <footer style="background: #1a1a1a; color: white; text-align: center; padding: 2rem;">
+        <p style="font-weight: 700; font-size: 1.3rem; margin-bottom: 1rem;">FORO 7 PRODUCCIONES</p>
+        <p>Fotografía | Video | Dron | Invitaciones Web</p>
+        <p style="margin-top: 1rem; color: #999;">
+            © 2025 Foro 7. Todos los derechos reservados.
+        </p>
+    </footer>
+    <script src="js/visitas.js?v=1"></script>
+<script src="js/foro7-footer.js"></script>
+</body>
+</html>

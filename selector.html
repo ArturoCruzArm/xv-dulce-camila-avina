@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selector de Fotos - XV Años Dulce Camila</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-purple: #667eea;
+            --primary-dark: #764ba2;
+            --accent-light: #9f7aea;
+            --accent-white: #ffffff;
+            --text-primary: #333333;
+            --cream: #faf8f3;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark) 100%);
+            color: var(--cream);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .main-title {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            color: var(--accent-white);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            color: var(--cream);
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .instructions {
+            color: var(--cream);
+            font-size: 1rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .instructions strong {
+            color: var(--accent-white);
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-info h3 {
+            color: var(--accent-white);
+            font-size: 1rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-count {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--cream);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-filter {
+            background: var(--accent-white);
+            color: var(--primary-dark);
+        }
+
+        .btn-filter:hover,
+        .btn-filter.active {
+            background: var(--accent-light);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(159, 122, 234, 0.4);
+        }
+
+        .btn-export {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Gallery */
+        .gallery-section {
+            padding: 20px 0 40px;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .photo-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .photo-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(159, 122, 234, 0.5);
+            border-color: var(--accent-light);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+
+        .photo-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border: 2px solid var(--accent-white);
+        }
+
+        .photo-badges {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .badge {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.ampliacion {
+            background: #9c27b0;
+            border: 2px solid #ce93d8;
+        }
+
+        .badge.impresion {
+            background: #2196f3;
+            border: 2px solid #90caf9;
+        }
+
+        .badge.redes_sociales {
+            background: #4caf50;
+            border: 2px solid #a5d6a7;
+        }
+
+        .badge.invitaciones_web {
+            background: #ff9100;
+            border: 2px solid #ffcc80;
+        }
+
+        .badge.descartada {
+            background: #f44336;
+            border: 2px solid #ef9a9a;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.96);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--primary-dark);
+            border-radius: 20px;
+            max-width: 1400px;
+            width: 100%;
+            max-height: 95vh;
+            overflow-y: auto;
+            position: relative;
+            border: 3px solid var(--accent-light);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2.5rem;
+            color: var(--accent-white);
+            cursor: pointer;
+            z-index: 10;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.2);
+        }
+
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(159, 122, 234, 0.9);
+            color: white;
+            border: none;
+            font-size: 3rem;
+            padding: 20px 15px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .modal-nav:hover {
+            background: var(--accent-light);
+        }
+
+        .modal-nav-prev {
+            left: 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .modal-nav-next {
+            right: 0;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .modal-image-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .modal-image-container img {
+            width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 10px;
+            pointer-events: none;
+        }
+
+        .modal-photo-number {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: 2px solid var(--accent-white);
+        }
+
+        .modal-options {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        .modal-options h3 {
+            font-family: 'Great Vibes', cursive;
+            color: var(--accent-white);
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-subtitle {
+            text-align: center;
+            color: var(--cream);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        .option-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            padding: 25px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            color: var(--cream);
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .option-btn:hover {
+            background: rgba(159, 122, 234, 0.2);
+            transform: scale(1.05);
+        }
+
+        .option-btn.selected {
+            background: var(--accent-light);
+            color: white;
+        }
+
+        .option-icon {
+            display: block;
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .option-label {
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .edit-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .edit-section label {
+            display: block;
+            color: var(--accent-white);
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .edit-section textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--cream);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .edit-section textarea:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--cream);
+            background: rgba(0, 0, 0, 0.3);
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin: 10px 0;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .spinner {
+            border: 5px solid rgba(159, 122, 234, 0.3);
+            border-top: 5px solid var(--accent-light);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .photos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+            }
+
+            .photo-card img {
+                height: 250px;
+            }
+
+            .modal-nav {
+                font-size: 2rem;
+                padding: 15px 10px;
+            }
+
+            .option-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <h1 class="main-title">Selector de Fotos</h1>
+        <p class="subtitle">XV Años de Dulce Camila Aviña Franco</p>
+        <div class="instructions">
+            <p><strong>Instrucciones:</strong> Haz clic en cada foto para seleccionar su uso. Puedes elegir múltiples opciones para cada foto.</p>
+            <p><strong>Categorías disponibles:</strong></p>
+            <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                <li>📸 <strong>Ampliación</strong> - Para ampliar e imprimir en gran tamaño</li>
+                <li>🖼️ <strong>Impresión</strong> - Para imprimir en tamaño estándar (5x7)</li>
+                <li>📱 <strong>Redes Sociales</strong> - Para compartir en redes sociales</li>
+                <li>💌 <strong>Invitaciones Web</strong> - Para usar en la invitación digital</li>
+                <li>🗑️ <strong>Descartar</strong> - Fotos que no deseas usar</li>
+            </ul>
+            <p style="margin-top: 10px;"><strong>Nota:</strong> Si necesitas edición en alguna foto, especifícalo en el campo de comentarios.</p>
+            <p style="margin-top: 15px;"><strong><i class="fas fa-mobile-alt"></i> Importante:</strong> Cuando presiones <strong style="color: var(--accent-white);">"Enviar Reporte"</strong>, se abrirá WhatsApp automáticamente con tu selección lista para enviar.</p>
+        </div>
+    </header>
+
+    <!-- Control Panel -->
+    <div class="container">
+        <div class="control-panel">
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon">📸</div>
+                    <div class="stat-info">
+                        <h3>Ampliación</h3>
+                        <div class="stat-count" id="count-ampliacion">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🖼️</div>
+                    <div class="stat-info">
+                        <h3>Impresión</h3>
+                        <div class="stat-count" id="count-impresion">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📱</div>
+                    <div class="stat-info">
+                        <h3>Redes Sociales</h3>
+                        <div class="stat-count" id="count-redes_sociales">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💌</div>
+                    <div class="stat-info">
+                        <h3>Inv. Web</h3>
+                        <div class="stat-count" id="count-invitaciones_web">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🗑️</div>
+                    <div class="stat-info">
+                        <h3>Descartadas</h3>
+                        <div class="stat-count" id="count-descartada">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-filter active" data-filter="all">
+                    <i class="fas fa-images"></i> Todas las Fotos
+                </button>
+                <button class="btn btn-filter" data-filter="ampliacion">
+                    <i class="fas fa-expand"></i> Ampliación
+                </button>
+                <button class="btn btn-filter" data-filter="impresion">
+                    <i class="fas fa-print"></i> Impresión
+                </button>
+                <button class="btn btn-filter" data-filter="redes_sociales">
+                    <i class="fas fa-share-alt"></i> Redes Sociales
+                </button>
+                <button class="btn btn-filter" data-filter="invitaciones_web">
+                    <i class="fas fa-envelope"></i> Inv. Web
+                </button>
+                <button class="btn btn-filter" data-filter="descartada">
+                    <i class="fas fa-trash"></i> Descartadas
+                </button>
+                <button class="btn btn-export" onclick="exportarSeleccion()">
+                    <i class="fab fa-whatsapp"></i> Enviar Reporte
+                </button>
+                <button class="btn btn-clear" onclick="limpiarSeleccion()">
+                    <i class="fas fa-eraser"></i> Limpiar Todo
+                </button>
+            </div>
+        </div>
+
+        <!-- Gallery -->
+        <section class="gallery-section">
+            <div class="photos-grid" id="photosGrid">
+                <!-- Photos will be loaded here dynamically -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="photoModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <button class="modal-nav modal-nav-prev" onclick="navigatePhoto(-1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="modal-nav modal-nav-next" onclick="navigatePhoto(1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <div class="modal-body">
+                <div class="modal-image-container">
+                    <img id="modalImage" src="" alt="">
+                    <div class="modal-photo-number" id="modalPhotoNumber">#001</div>
+                </div>
+
+                <div class="modal-options">
+                    <h3>Selecciona el uso de esta foto</h3>
+                    <p class="modal-subtitle">Puedes elegir una o varias opciones</p>
+
+                    <div class="option-buttons">
+                        <div class="option-btn" data-option="ampliacion">
+                            <span class="option-icon">📸</span>
+                            <div class="option-label">Ampliación</div>
+                        </div>
+                        <div class="option-btn" data-option="impresion">
+                            <span class="option-icon">🖼️</span>
+                            <div class="option-label">Impresión</div>
+                        </div>
+                        <div class="option-btn" data-option="redes_sociales">
+                            <span class="option-icon">📱</span>
+                            <div class="option-label">Redes Sociales</div>
+                        </div>
+                        <div class="option-btn" data-option="invitaciones_web">
+                            <span class="option-icon">💌</span>
+                            <div class="option-label">Inv. Web</div>
+                        </div>
+                        <div class="option-btn" data-option="descartada">
+                            <span class="option-icon">🗑️</span>
+                            <div class="option-label">Descartar</div>
+                        </div>
+                    </div>
+
+                    <div class="edit-section">
+                        <label for="editNotes">
+                            <i class="fas fa-edit"></i> Comentarios o Ediciones Requeridas
+                        </label>
+                        <textarea
+                            id="editNotes"
+                            placeholder="Ejemplo: Recortar fondo, mejorar iluminación, eliminar objetos, etc."
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><strong>XV Años de Dulce Camila</strong> - 16 de Mayo de 2026</p>
+        <p>León, Guanajuato</p>
+    </footer>
+
+    <script>
+        // Deshabilitar clic derecho en todo el sitio
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Deshabilitar arrastrar imágenes
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Deshabilitar selección de imágenes
+        document.addEventListener('selectstart', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Variables globales
+        // photos se carga desde photos_list.js
+        let currentPhotoIndex = 0;
+        // Cargar selecciones predeterminadas
+        let selections = typeof defaultSelections !== 'undefined' ? {...defaultSelections} : {};
+        const STORAGE_KEY = 'xv_dulce_camila';
+        // Cargar desde localStorage
+        try { var _saved = localStorage.getItem(STORAGE_KEY); if (_saved) selections = Object.assign(selections, JSON.parse(_saved)); } catch(e) {}
+        function saveSelections() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(selections)); } catch(e) {} }
+        let activeFilter = 'all';
+
+        // Las fotos se cargan automáticamente desde photos_list.js
+        console.log(`Selecciones predeterminadas cargadas: ${Object.keys(selections).length} fotos`);
+
+        // Renderizar galería
+        function renderGallery() {
+            const grid = document.getElementById('photosGrid');
+            grid.innerHTML = '';
+
+            photos.forEach((photo, index) => {
+                if (activeFilter !== 'all' && (!selections[photo.name] || !selections[photo.name].categories.includes(activeFilter))) {
+                    return;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.onclick = () => openModal(index);
+
+                const badges = selections[photo.name]?.categories.map(cat =>
+                    `<span class="badge ${cat}">${getCategoryLabel(cat)}</span>`
+                ).join('') || '';
+
+                card.innerHTML = `
+                    <img src="${photo.path}" alt="Foto ${index + 1}" loading="lazy">
+                    <div class="photo-number">#${String(index + 1).padStart(3, '0')}</div>
+                    <div class="photo-badges">${badges}</div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Abrir modal
+        function openModal(index) {
+            currentPhotoIndex = index;
+            const photo = photos[index];
+
+            document.getElementById('modalImage').src = photo.path;
+            document.getElementById('modalPhotoNumber').textContent = `#${String(index + 1).padStart(3, '0')}`;
+            document.getElementById('photoModal').classList.add('active');
+
+            // Cargar selecciones actuales
+            const photoSelections = selections[photo.name] || { categories: [], notes: '' };
+
+            // Actualizar botones
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                const option = btn.dataset.option;
+                if (photoSelections.categories.includes(option)) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+
+            // Cargar notas
+            document.getElementById('editNotes').value = photoSelections.notes || '';
+
+            // Bloquear scroll del body
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('photoModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Navegar fotos
+        function navigatePhoto(direction) {
+            currentPhotoIndex = (currentPhotoIndex + direction + photos.length) % photos.length;
+            openModal(currentPhotoIndex);
+        }
+
+        // Manejar selección de categorías
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const photo = photos[currentPhotoIndex];
+                const option = this.dataset.option;
+
+                if (!selections[photo.name]) {
+                    selections[photo.name] = { categories: [], notes: '' };
+                }
+
+                const categories = selections[photo.name].categories;
+                const index = categories.indexOf(option);
+
+                if (index > -1) {
+                    categories.splice(index, 1);
+                    saveSelections();
+                    this.classList.remove('selected');
+                } else {
+                    categories.push(option);
+                    saveSelections();
+                    this.classList.add('selected');
+                }
+
+                updateStats();
+                renderGallery();
+            });
+        });
+
+        // Guardar notas
+        document.getElementById('editNotes').addEventListener('input', function() {
+            const photo = photos[currentPhotoIndex];
+            if (!selections[photo.name]) {
+                selections[photo.name] = { categories: [], notes: '' };
+            }
+            selections[photo.name].notes = this.value;
+            saveSelections();
+        });
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const counts = {
+                ampliacion: 0,
+                impresion: 0,
+                redes_sociales: 0,
+                invitaciones_web: 0,
+                descartada: 0
+            };
+
+            Object.values(selections).forEach(selection => {
+                selection.categories.forEach(cat => {
+                    if (counts[cat] !== undefined) {
+                        counts[cat]++;
+                    }
+                });
+            });
+
+            Object.keys(counts).forEach(cat => {
+                document.getElementById(`count-${cat}`).textContent = counts[cat];
+            });
+
+            return counts;
+        }
+
+        // Filtros
+        document.querySelectorAll('.btn-filter').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                activeFilter = this.dataset.filter;
+                renderGallery();
+            });
+        });
+
+        // Exportar selección
+        function exportarSeleccion() {
+            const stats = updateStats();
+
+            // Crear mensaje de resumen
+            let mensaje = '💜 SELECCIÓN DE FOTOS - XV AÑOS DULCE CAMILA\n';
+            mensaje += '═══════════════════════════════════════\n\n';
+            mensaje += `📊 RESUMEN GENERAL:\n`;
+            mensaje += `   Total de fotos: ${photos.length}\n`;
+            mensaje += `   🖼️  Para ampliación: ${stats.ampliacion}\n`;
+            mensaje += `   📸 Para impresión: ${stats.impresion}\n`;
+            mensaje += `   📱 Para redes sociales: ${stats.redes_sociales}\n`;
+            mensaje += `   🌐 Para invitaciones web: ${stats.invitaciones_web}\n`;
+            mensaje += `   ❌ Descartadas: ${stats.descartada}\n\n`;
+
+            // Detalles por categoría
+            const categorias = {
+                ampliacion: '🖼️  AMPLIACIÓN',
+                impresion: '📸 IMPRESIÓN',
+                redes_sociales: '📱 REDES SOCIALES',
+                invitaciones_web: '🌐 INVITACIONES WEB',
+                descartada: '❌ DESCARTADAS'
+            };
+
+            Object.keys(categorias).forEach(categoria => {
+                const fotosCategoria = [];
+                photos.forEach((photo, index) => {
+                    const selection = selections[photo.name];
+                    if (selection && selection.categories && selection.categories.includes(categoria)) {
+                        fotosCategoria.push({
+                            numero: index + 1,
+                            nombre: photo.filename
+                        });
+                    }
+                });
+
+                if (fotosCategoria.length > 0) {
+                    mensaje += `${categorias[categoria]}:\n`;
+                    fotosCategoria.forEach(foto => {
+                        mensaje += `   • #${foto.numero} - ${foto.nombre}\n`;
+                    });
+                    mensaje += `   Total: ${fotosCategoria.length}\n\n`;
+                }
+            });
+
+            // Agregar comentarios si hay
+            const fotosConComentarios = [];
+            photos.forEach((photo, index) => {
+                const selection = selections[photo.name];
+                if (selection && selection.notes && selection.notes.trim() !== '') {
+                    fotosConComentarios.push(`   📸 Foto #${index + 1}: ${selection.notes}`);
+                }
+            });
+
+            if (fotosConComentarios.length > 0) {
+                mensaje += `\n💬 COMENTARIOS Y EDICIONES:\n`;
+                mensaje += fotosConComentarios.join('\n') + '\n';
+            }
+
+            mensaje += `\n📅 Generado el: ${new Date().toLocaleString('es-MX')}\n`;
+
+            // Codificar mensaje para URL
+            const mensajeCodificado = encodeURIComponent(mensaje);
+
+            // Número de WhatsApp (deberás actualizarlo con el número correcto)
+            const whatsappURL = `https://wa.me/524779203776?text=${mensajeCodificado}`;
+
+            // Abrir WhatsApp
+            window.open(whatsappURL, '_blank');
+
+            alert('Abriendo WhatsApp para enviar tu selección...');
+        }
+
+        // Limpiar selección
+        function limpiarSeleccion() {
+            if (confirm('¿Estás segura de que quieres limpiar toda la selección?')) {
+                selections = {};
+                updateStats();
+                renderGallery();
+                alert('Selección limpiada');
+            }
+        }
+
+        // Obtener etiqueta de categoría
+        function getCategoryLabel(category) {
+            const labels = {
+                ampliacion: 'Ampliación',
+                impresion: 'Impresión',
+                redes_sociales: 'Redes',
+                invitaciones_web: 'Inv. Web',
+                descartada: 'Descartada'
+            };
+            return labels[category] || category;
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('photoModal').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') {
+                    navigatePhoto(-1);
+                } else if (e.key === 'ArrowRight') {
+                    navigatePhoto(1);
+                } else if (e.key === 'Escape') {
+                    closeModal();
+                }
+            }
+        });
+
+    </script>
+
+    <!-- Lista de fotos -->
+    <script src="photos_list.js"></script>
+    <script src="default_selections.js"></script>
+    <script src="js/visitas.js?v=1"></script>
+<script src="js/selector-sb-inline.js"></script>
+<script src="js/foro7-footer.js"></script>
+</body>
+</html>
