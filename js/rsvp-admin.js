@@ -105,7 +105,7 @@
     }
 
     // ── Marcar como enviada + abrir WhatsApp ─────────────────────────────────
-    async function sendWhatsApp(id) {
+    function sendWhatsApp(id) {
         const g = guests.find(x => x.id === id);
         if (!g) return;
         const link = `${BASE_URL}/index.html?inv=${g.token}`;
@@ -113,21 +113,23 @@
         const evDate = cfg.eventDate ? ` el ${cfg.eventDate}` : '';
         const msg  = `Hola ${g.nombre} 👑✨\n\nTe invitamos cordialmente a *${evName}*${evDate}.\n\nTu enlace de invitación personalizada:\n${link}\n\nPor favor confirma tu asistencia desde el enlace. Tienes *${g.pases_asignados} ${g.pases_asignados === 1 ? 'pase' : 'pases'}* asignados. 🎀`;
 
-        // Marcar como enviada
-        await fetch(`${SB_URL}/rest/v1/invitados?id=eq.${id}`, {
-            method: 'PATCH',
-            headers: Object.assign({}, SB_H, { 'Prefer': 'return=minimal' }),
-            body: JSON.stringify({ status: 'enviada', fecha_envio: new Date().toISOString() })
-        });
-        const idx = guests.findIndex(x => x.id === id);
-        if (idx >= 0) { guests[idx].status = 'enviada'; guests[idx].fecha_envio = new Date().toISOString(); }
-        renderAll();
-
+        // Abrir WhatsApp PRIMERO (sincrónico, dentro del user gesture)
         const phone = g.telefono ? g.telefono.replace(/\D/g, '') : '';
         const wa = phone
             ? `https://wa.me/52${phone}?text=${encodeURIComponent(msg)}`
             : `https://wa.me/?text=${encodeURIComponent(msg)}`;
         window.open(wa, '_blank');
+
+        // Marcar como enviada DESPUÉS (async, no bloquea el popup)
+        fetch(`${SB_URL}/rest/v1/invitados?id=eq.${id}`, {
+            method: 'PATCH',
+            headers: Object.assign({}, SB_H, { 'Prefer': 'return=minimal' }),
+            body: JSON.stringify({ status: 'enviada', fecha_envio: new Date().toISOString() })
+        }).then(() => {
+            const idx = guests.findIndex(x => x.id === id);
+            if (idx >= 0) { guests[idx].status = 'enviada'; guests[idx].fecha_envio = new Date().toISOString(); }
+            renderAll();
+        });
     }
 
     // ── Confirmar manualmente (sin WhatsApp) ─────────────────────────────────
