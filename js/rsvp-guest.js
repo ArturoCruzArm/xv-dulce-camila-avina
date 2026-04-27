@@ -63,9 +63,12 @@
         const section  = document.getElementById('personalizedWelcome');
         const textEl   = document.getElementById('guestWelcomeText');
         const pasesEl  = document.getElementById('guestPassesText');
+        const libre = g.pases_asignados === 0;
         if (section && textEl && pasesEl) {
             textEl.textContent = `${g.nombre}, estás cordialmente invitado(a) a celebrar mis XV años`;
-            pasesEl.innerHTML  = `<i class="fas fa-ticket-alt"></i> ${g.pases_asignados} ${g.pases_asignados === 1 ? 'pase asignado' : 'pases asignados'}`;
+            pasesEl.innerHTML  = libre
+                ? `<i class="fas fa-ticket-alt"></i> Pases libres — tú decides cuántos asisten`
+                : `<i class="fas fa-ticket-alt"></i> ${g.pases_asignados} ${g.pases_asignados === 1 ? 'pase asignado' : 'pases asignados'}`;
             section.style.display = 'block';
         }
 
@@ -73,17 +76,18 @@
         const nameInput = document.getElementById('name');
         if (nameInput) nameInput.value = g.nombre;
 
-        // Limitar select de pases al número asignado
+        // Limitar select de pases al número asignado (o 1-10 si es libre)
         const guestsSelect = document.getElementById('guests');
         if (guestsSelect) {
+            const max = libre ? 10 : g.pases_asignados;
             guestsSelect.innerHTML = '<option value="">Selecciona...</option>';
-            for (let i = 1; i <= g.pases_asignados; i++) {
+            for (let i = 1; i <= max; i++) {
                 const opt = document.createElement('option');
                 opt.value = i;
                 opt.textContent = i === 1 ? '1 persona' : `${i} personas`;
                 guestsSelect.appendChild(opt);
             }
-            if (g.pases_asignados >= 1) guestsSelect.value = g.pases_asignados;
+            if (!libre && g.pases_asignados >= 1) guestsSelect.value = g.pases_asignados;
         }
 
         // Si ya confirmó → mostrar estado, ocultar form

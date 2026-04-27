@@ -149,8 +149,8 @@
                     <button id="_mc_si" style="flex:1;padding:10px;border-radius:8px;border:2px solid #55efc4;background:#f0fff8;font-weight:700;cursor:pointer;">✅ Sí asistirá</button>
                     <button id="_mc_no" style="flex:1;padding:10px;border-radius:8px;border:2px solid #ccc;background:#f9f9f9;font-weight:700;cursor:pointer;">❌ No asistirá</button>
                 </div>
-                <label style="font-size:.82rem;font-weight:700;display:block;margin-bottom:6px;">Personas que asistirán</label>
-                <input id="_mc_pases" type="number" min="0" max="${g.pases_asignados}" value="${g.pases_asignados}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:1rem;box-sizing:border-box;margin-bottom:18px;">
+                <label style="font-size:.82rem;font-weight:700;display:block;margin-bottom:6px;">Personas que asistirán${g.pases_asignados === 0 ? ' <span style="color:#f39c12">(Libre)</span>' : ''}</label>
+                <input id="_mc_pases" type="number" min="0" ${g.pases_asignados > 0 ? 'max="' + g.pases_asignados + '"' : ''} value="${g.pases_asignados || 1}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:1rem;box-sizing:border-box;margin-bottom:18px;">
                 <div style="display:flex;gap:10px;">
                     <button id="_mc_cancel" style="flex:1;padding:10px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer;">Cancelar</button>
                     <button id="_mc_save" style="flex:1;padding:10px;border-radius:8px;background:#6c5ce7;color:#fff;border:none;font-weight:700;cursor:pointer;">Guardar</button>
@@ -293,7 +293,7 @@
             <tr data-id="${g.id}">
                 <td><strong>${g.nombre}</strong>${g.notas ? `<br><small style="color:#999">${g.notas}</small>` : ''}</td>
                 <td><span class="badge-cat cat-${g.categoria}">${g.categoria || '—'}</span></td>
-                <td style="text-align:center">${g.pases_asignados}</td>
+                <td style="text-align:center">${g.pases_asignados === 0 ? '<span style="color:#f39c12;font-weight:700">Libre</span>' : g.pases_asignados}</td>
                 <td style="text-align:center">${pConf}</td>
                 <td>${g.mesa_asignada || '—'}</td>
                 <td><span class="status-badge ${s.cls}">${s.icon} ${s.text}</span></td>

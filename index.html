@@ -1138,7 +1138,7 @@
         document.querySelectorAll('.splash-names,.splash-name,.splash-title').forEach(function(el){el.style.display='none';});
         if(dateEl)dateEl.style.display='none';
         if(gEl){gEl.textContent=g.nombre;gEl.style.display='block';}
-        if(pEl){pEl.textContent='\ud83c\udf9f '+g.pases_asignados+' '+(g.pases_asignados===1?'pase':'pases');pEl.style.display='block';}
+        if(pEl){pEl.textContent=g.pases_asignados===0?'\ud83c\udf9f Pases libres':'\ud83c\udf9f '+g.pases_asignados+' '+(g.pases_asignados===1?'pase':'pases');pEl.style.display='block';}
         if(btn)btn.textContent='Ver mi Invitación';
     }).catch(function(){});
 })();
