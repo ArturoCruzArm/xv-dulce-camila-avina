@@ -968,17 +968,15 @@
                     <input type="text" id="name" name="name" required placeholder="Tu nombre completo">
                 </div>
                 <div class="form-group">
-                    <label for="guests">Número de personas *</label>
-                    <select id="guests" name="guests" required>
-                        <option value="">Selecciona...</option>
-                        <option value="1">1 persona</option>
-                        <option value="2">2 personas</option>
-                        <option value="3">3 personas</option>
-                        <option value="4">4 personas</option>
-                        <option value="5">5 personas</option>
-                    </select>
+                    <label for="guests">Número de personas (incluyéndote) *</label>
+                    <input type="number" id="guests" name="guests" min="1" max="20" value="1" required>
                 </div>
-                <div class="form-group">
+                
+                    <div class="form-group" id="nombresGroup" style="display:none;">
+                        <label>Nombres de tus acompanantes</label>
+                        <div id="nombresContainer"></div>
+                    </div>
+<div class="form-group">
                     <label for="attendance">¿Confirmas tu asistencia? *</label>
                     <select id="attendance" name="attendance" required>
                         <option value="">Selecciona...</option>
@@ -1038,9 +1036,34 @@
         const SLUG    = 'xv-dulce-camila-avina';
         const WA_NUM  = '5214776684807'; // Ana Leticia Franco Sánchez
 
-        function attachHandler() {
+        
+        function buildNombreInputs(count) {
+            var container = document.getElementById('nombresContainer');
+            var group = document.getElementById('nombresGroup');
+            if (!container || !group) return;
+            container.innerHTML = '';
+            var numAcomp = Math.max(0, count - 1);
+            group.style.display = numAcomp > 0 ? 'block' : 'none';
+            for (var i = 0; i < numAcomp; i++) {
+                var inp = document.createElement('input');
+                inp.type = 'text';
+                inp.className = 'nombre-asistente';
+                inp.placeholder = 'Acompanante ' + (i + 1);
+                inp.style.cssText = 'width:100%;padding:10px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:rgba(255,255,255,0.08);color:inherit;font-size:.95rem;';
+                container.appendChild(inp);
+            }
+        }
+
+function attachHandler() {
             const form = document.getElementById('rsvpForm');
             if (!form) return;
+            var guestsInput = document.getElementById('guests');
+            if (guestsInput) {
+                guestsInput.addEventListener('change', function(){ buildNombreInputs(parseInt(this.value)||1); });
+                guestsInput.addEventListener('input', function(){ buildNombreInputs(parseInt(this.value)||1); });
+                buildNombreInputs(parseInt(guestsInput.value)||1);
+            }
+
 
             form.addEventListener('submit', async function (e) {
                 e.preventDefault();
@@ -1048,6 +1071,7 @@
                 const pases   = parseInt(document.getElementById('guests')?.value || '1');
                 const asiste  = document.getElementById('attendance')?.value === 'si';
                 const mensaje = (document.getElementById('message')?.value || '').trim();
+                                const nombres = Array.from(document.querySelectorAll('.nombre-asistente')).map(function(inp){ return inp.value.trim(); }).filter(Boolean);
                 if (!nombre) return;
 
                 const btn = form.querySelector('button[type="submit"]');
@@ -1057,9 +1081,9 @@
                     const evR = await fetch(`${SB_URL}/rest/v1/eventos?slug=eq.${SLUG}&select=id&limit=1`, { headers: SB_H });
                     const [ev] = await evR.json();
                     if (ev?.id) {
-                        await fetch(`${SB_URL}/rest/v1/invitados`, {
+                        const r_inv = await fetch(`${SB_URL}/rest/v1/invitados`, {
                             method: 'POST',
-                            headers: { ...SB_H, 'Prefer': 'return=minimal' },
+                            headers: { ...SB_H, 'Prefer': 'return=representation' },
                             body: JSON.stringify({
                                 evento_id: ev.id,
                                 nombre, pases_asignados: pases, pases_confirmados: pases,
@@ -1068,6 +1092,13 @@
                                 fecha_confirmacion: new Date().toISOString()
                             })
                         });
+                        const [inv] = await r_inv.json();
+                        if (inv?.id && nombres.length) {
+                            await fetch(`${SB_URL}/rest/v1/acompanantes`, {
+                                method: 'POST', headers: { ...SB_H, 'Prefer': 'return=minimal' },
+                                body: JSON.stringify(nombres.map((n,i) => ({ invitado_id: inv.id, nombre: n, orden: i })))
+                            });
+                        }
                     }
                 } catch (err) {}
 
@@ -1076,7 +1107,7 @@
                 if (succ) succ.style.display = 'block';
 
                 const txt = asiste
-                    ? `Hola, confirmo mi asistencia a los XV años de Dulce Camila.\nNombre: ${nombre}\nPersonas: ${pases}${mensaje ? '\nMensaje: ' + mensaje : ''}`
+                    ? `Hola, confirmo mi asistencia a los XV años de Dulce Camila.\nNombre: ${nombre}\nPersonas: ${pases}${nombres.length ? "\nAcompanantes: " + nombres.join(", ") : ""}${mensaje ? '\nMensaje: ' + mensaje : ''}`
                     : `Hola, lamentablemente no podré asistir a los XV años de Dulce Camila.\nNombre: ${nombre}${mensaje ? '\nMensaje: ' + mensaje : ''}`;
                 setTimeout(() => window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent(txt)}`, '_blank'), 400);
             });
