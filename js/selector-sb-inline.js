@@ -1,5 +1,6 @@
 // selector-sb-inline.js — Supabase sync para selectores inline Foro 7
 // Slug: xv-dulce-camila-avina | Storage key: xv_dulce_camila_avina
+// v2: protección _sbLoaded, multi-session, no-delete-on-empty, merge inteligente
 (function () {
     const SUPABASE_URL  = 'https://nzpujmlienzfetqcgsxz.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cHVqbWxpZW56ZmV0cWNnc3h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODYzMzYsImV4cCI6MjA5MDI2MjMzNn0.xl3lsb-KYj5tVLKTnzpbsdEGoV9ySnswH4eyRuyEH1s';
@@ -14,97 +15,170 @@
     let eventoId   = null;
     let sbOk       = true;
     let _syncing   = false;
+    let _sbLoaded  = false;   // true solo después de que sbLoad termina
     let _syncTimer = null;
+    let _lastHash  = '';      // hash del último snapshot para evitar syncs duplicados
 
     async function getEventoId() {
         if (eventoId) return eventoId;
-        const r = await fetch(SUPABASE_URL + '/rest/v1/eventos?slug=eq.' + EVENTO_SLUG + '&select=id&limit=1', { headers: SB_H });
-        const rows = await r.json();
+        var r = await fetch(SUPABASE_URL + '/rest/v1/eventos?slug=eq.' + EVENTO_SLUG + '&select=id&limit=1', { headers: SB_H });
+        var rows = await r.json();
         eventoId = rows[0] ? rows[0].id : null;
         return eventoId;
     }
 
-    // Sync selections snapshot to Supabase (single row, foto_index=0, datos=full object)
+    // Hash simple para detectar cambios
+    function quickHash(obj) {
+        return JSON.stringify(obj);
+    }
+
+    // Filtra selecciones válidas (con categorías o notas)
+    function filterValid(sels) {
+        var clean = {};
+        Object.entries(sels).forEach(function(e) {
+            var s = e[1];
+            if (s && ((s.categories && s.categories.length) || s.notes)) {
+                clean[e[0]] = s;
+            }
+        });
+        return clean;
+    }
+
+    // Sync: UPSERT por session_id, nunca DELETE global
     async function sbSync(sels) {
-        if (!sbOk) return;
+        if (!sbOk || !_sbLoaded) return;
         try {
-            const eid = await getEventoId();
+            var eid = await getEventoId();
             if (!eid) return;
-            await fetch(SUPABASE_URL + '/rest/v1/selecciones?evento_id=eq.' + eid, { method: 'DELETE', headers: SB_H });
-            const entries = Object.entries(sels).filter(function(e) {
-                var s = e[1];
-                return s && ((s.categories && s.categories.length) || s.notes);
-            });
-            if (!entries.length) return;
-            // Store as individual rows keyed by filename index, plus full snapshot in datos
-            var snapshot = {};
-            entries.forEach(function(e) { snapshot[e[0]] = e[1]; });
-            await fetch(SUPABASE_URL + '/rest/v1/selecciones', {
-                method: 'POST',
-                headers: Object.assign({}, SB_H, { 'Prefer': 'return=minimal' }),
-                body: JSON.stringify([{
-                    evento_id: eid,
-                    session_id: sid,
-                    foto_index: 0,
-                    impresion: false,
-                    invitacion: false,
-                    descartada: false,
-                    ampliacion: false,
-                    datos: snapshot
-                }])
-            });
+
+            var snapshot = filterValid(sels);
+
+            // No borrar datos remotos si no hay selecciones locales
+            if (!Object.keys(snapshot).length) return;
+
+            // Evitar sync duplicado si nada cambió
+            var hash = quickHash(snapshot);
+            if (hash === _lastHash) return;
+            _lastHash = hash;
+
+            // UPSERT: insertar o actualizar por (evento_id, session_id)
+            // Primero intentar actualizar la fila existente de esta sesión
+            var existing = await fetch(
+                SUPABASE_URL + '/rest/v1/selecciones?evento_id=eq.' + eid + '&session_id=eq.' + sid + '&select=id',
+                { headers: SB_H }
+            );
+            var rows = await existing.json();
+
+            if (rows.length > 0) {
+                // UPDATE existente
+                await fetch(
+                    SUPABASE_URL + '/rest/v1/selecciones?id=eq.' + rows[0].id,
+                    {
+                        method: 'PATCH',
+                        headers: Object.assign({}, SB_H, { 'Prefer': 'return=minimal' }),
+                        body: JSON.stringify({ datos: snapshot })
+                    }
+                );
+            } else {
+                // INSERT nuevo
+                await fetch(SUPABASE_URL + '/rest/v1/selecciones', {
+                    method: 'POST',
+                    headers: Object.assign({}, SB_H, { 'Prefer': 'return=minimal' }),
+                    body: JSON.stringify([{
+                        evento_id: eid,
+                        session_id: sid,
+                        foto_index: 0,
+                        impresion: false,
+                        invitacion: false,
+                        descartada: false,
+                        ampliacion: false,
+                        datos: snapshot
+                    }])
+                });
+            }
         } catch(e) { sbOk = false; }
+    }
+
+    // Merge inteligente: combina selecciones de todas las sesiones
+    // La selección más completa (más categorías) gana por foto
+    function mergeSelections(sesiones) {
+        var merged = {};
+        sesiones.forEach(function(datos) {
+            if (!datos || typeof datos !== 'object') return;
+            Object.entries(datos).forEach(function(e) {
+                var key = e[0], sel = e[1];
+                if (!sel) return;
+                var existing = merged[key];
+                if (!existing) {
+                    merged[key] = sel;
+                } else {
+                    // Merge categorías (unión)
+                    var cats = new Set((existing.categories || []).concat(sel.categories || []));
+                    merged[key] = {
+                        categories: Array.from(cats),
+                        notes: sel.notes || existing.notes || ''
+                    };
+                }
+            });
+        });
+        return merged;
     }
 
     async function sbLoad(isPoll) {
         if (!sbOk) return;
         try {
-            const eid = await getEventoId();
+            var eid = await getEventoId();
             if (!eid) return;
-            const r = await fetch(
-                SUPABASE_URL + '/rest/v1/selecciones?evento_id=eq.' + eid + '&select=foto_index,datos',
+            var r = await fetch(
+                SUPABASE_URL + '/rest/v1/selecciones?evento_id=eq.' + eid + '&select=session_id,datos',
                 { headers: SB_H }
             );
-            const rows = await r.json();
+            var rows = await r.json();
 
-            // Merge all datos snapshots from Supabase
-            var sb = {};
-            rows.forEach(function(row) {
-                if (row.datos && typeof row.datos === 'object') {
-                    Object.assign(sb, row.datos);
-                }
-            });
+            // Merge todas las sesiones remotas
+            var allDatos = rows.map(function(row) { return row.datos; });
+            var sb = mergeSelections(allDatos);
 
             var merged;
             if (isPoll) {
-                merged = sb;
-            } else {
+                // En poll: merge remoto + local (local tiene prioridad)
                 var local = {};
                 try { local = JSON.parse(localStorage.getItem(SB_KEY) || '{}'); } catch(e) {}
-                merged = Object.assign({}, sb);
-                Object.entries(local).forEach(function(e) {
-                    var s = e[1];
-                    if (s && ((s.categories && s.categories.length) || s.notes)) merged[e[0]] = s;
-                });
+                merged = mergeSelections([sb, filterValid(local)]);
+            } else {
+                // Carga inicial: merge remoto + local
+                var local = {};
+                try { local = JSON.parse(localStorage.getItem(SB_KEY) || '{}'); } catch(e) {}
+                merged = mergeSelections([sb, filterValid(local)]);
             }
 
             _syncing = true;
             try {
                 localStorage.setItem(SB_KEY, JSON.stringify(merged));
+                // Actualizar objeto selections del selector inline
+                if (typeof selections !== 'undefined') {
+                    Object.keys(selections).forEach(function(k) { delete selections[k]; });
+                    Object.assign(selections, merged);
+                }
                 if (typeof renderGallery === 'function') renderGallery();
+                if (typeof updateStats === 'function') updateStats();
             } finally { _syncing = false; }
+
+            // Marcar como cargado ANTES del primer sync
+            _sbLoaded = true;
+            _lastHash = quickHash(filterValid(merged));
 
             if (!isPoll) {
                 if (Object.keys(merged).length) sbSync(merged).catch(function(){});
                 sbRegistrarVisita();
                 mostrarBanner(merged);
             }
-        } catch(e) { sbOk = false; }
+        } catch(e) { sbOk = false; _sbLoaded = true; }
     }
 
     async function sbRegistrarVisita() {
         try {
-            const eid = await getEventoId();
+            var eid = await getEventoId();
             if (!eid) return;
             await fetch(SUPABASE_URL + '/rest/v1/visitas', {
                 method: 'POST',
@@ -127,11 +201,11 @@
         document.body.insertBefore(banner, document.body.firstChild);
     }
 
-    // Patch localStorage to detect saves from inline selector
+    // Patch localStorage para detectar saves del selector inline
     var _origSet = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(key, value) {
         _origSet(key, value);
-        if (key === SB_KEY && !_syncing) {
+        if (key === SB_KEY && !_syncing && _sbLoaded) {
             clearTimeout(_syncTimer);
             _syncTimer = setTimeout(function() {
                 try { sbSync(JSON.parse(value)); } catch(e) {}
@@ -141,10 +215,11 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         sbLoad(false);
+        // Poll cada 15s para actualizar sin sobreescribir
         setInterval(function() {
             var open = window.modalOpen ||
                 document.querySelector('.modal[style*="block"],.modal.active,.modal.show,#photoModal[style*="flex"],#photoModal[style*="block"]');
             if (!open) sbLoad(true);
-        }, 30000);
+        }, 15000);
     });
 })();
