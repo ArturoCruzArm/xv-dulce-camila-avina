@@ -56,6 +56,13 @@
             // No borrar datos remotos si no hay selecciones locales
             if (!Object.keys(snapshot).length) return;
 
+            var _clockKey = SB_KEY + '_clock';
+            var _clock = 0;
+            try { _clock = Number(localStorage.getItem(_clockKey) || '0'); } catch(e) {}
+            _clock++;
+            try { localStorage.setItem(_clockKey, String(_clock)); } catch(e) {}
+            snapshot._sync = { clock: _clock, sid: sid, updatedAt: new Date().toISOString() };
+
             // Evitar sync duplicado si nada cambió
             var hash = quickHash(snapshot);
             if (hash === _lastHash) return;
@@ -76,7 +83,7 @@
                     {
                         method: 'PATCH',
                         headers: Object.assign({}, SB_H, { 'Prefer': 'return=minimal' }),
-                        body: JSON.stringify({ datos: snapshot })
+                        body: JSON.stringify({ datos: snapshot, code_version: 5 })
                     }
                 );
             } else {
@@ -92,7 +99,8 @@
                         invitacion: false,
                         descartada: false,
                         ampliacion: false,
-                        datos: snapshot
+                        datos: snapshot,
+                        code_version: 5
                     }])
                 });
             }
